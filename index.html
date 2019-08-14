@@ -59,21 +59,29 @@
 
             // returns the companies that have n or more offerings
             const companiesByNumberOfOfferings = (companies, offerings, numOfOffers) => {
-                const companiesOfferCount = companies.map(company => {
-                    const count = offerings.reduce((sum, offering) => {
-                        if (offering.id === company.offeringId) count++
-                        return count
-                    })
-                })
+                const companiesWithOfferCount = companies.reduce(((acc, company) => {
+                    const count = offerings.reduce((sum, offering) => ((offering.companyId === company.id) ? sum = sum + 1 : sum), 0)
+                    if (count >= 3) acc.push({...company, offerCount : count})
+                    return acc
+                }), [])
 
-                return companiesOfferCount.filter(count => { if(count >= numOfOffers) return companies.indexOf(count) })
-
+                return companiesWithOfferCount
             }
-            
+
             const threeOrMoreOfferings = companiesByNumberOfOfferings(companies, offerings, 3)
             console.log(threeOrMoreOfferings)
 
             // returns array of products where each product has the average price of it's offerings
+            const processProducts = ({products, offerings}) => {
+                const productsWithAvgPrice = products.map(product => {
+                    const offers = offerings.filter(offer => offer.productId === product.id)
+                    const sumPrice = offers.reduce(((sum , offer) => sum + offer.price),0)
+                    const avg = sumPrice / (offers.length)
+                    return {...product, avgPrice: avg}
+                })
+                return productsWithAvgPrice
+            }
+
             const processedProducts = processProducts({products, offerings})
             console.log(processedProducts)
 
